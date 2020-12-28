@@ -5,7 +5,6 @@ property dueTaskFile : "<file path>"
 property scpCmd : "<scp cmd string>" -- it's like  "scp -i /Users/MyName/key /Users/MyName/Project/calender-omnifocus/*.ini MyName@IP:/opt/calendar/bin/tasks/"
 
 on run {}
-	set readyTaskList to {}
 	tell application "OmniFocus"
 		tell front document window of default document to set its perspective name to beginTaskPerspectiveName
 		tell content of front document window of default document to set taskList to (value of every leaf)
@@ -60,11 +59,6 @@ on run {}
 	end tell
 	do shell script (scpCmd)
 end run
-
-on GetTaskFromPerspectiveAndWriteToFile(PerspectiveName, FileName)
-	try
-	end try
-end GetTaskFromPerspectiveAndWriteToFile
 
 on WriteStringToFile(this_data, target_file, append_data) -- (string to write, file path as string, boolean status append or not)
 	try
