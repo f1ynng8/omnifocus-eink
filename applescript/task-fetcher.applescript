@@ -5,6 +5,9 @@ property dueTaskFile : "<file path>"
 property scpCmd : "<scp cmd string>" -- it's like  "scp -i /Users/MyName/key /Users/MyName/Project/calender-omnifocus/*.ini MyName@IP:/opt/calendar/bin/tasks/"
 
 on run {}
+	if not ((do shell script "ping -o -t 1 <Raspberry Pi IP>" & "&>/dev/null && echo yes || echo no") as boolean) then
+		return "Raspberry Pi off-line"
+	end if
 	tell application "OmniFocus"
 		tell front document window of default document to set its perspective name to beginTaskPerspectiveName
 		tell content of front document window of default document to set taskList to (value of every leaf)
