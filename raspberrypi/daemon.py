@@ -23,6 +23,21 @@ festivalsDays={}
 holiDays={}
 workDays={}
 
+#panel config
+panel_width = 800
+panel_hight = 600
+
+zone0_x = 0
+zone0_y = 10
+zone1_x = panel_width/3
+zone1_y = 10
+zone2_x = panel_width/3*2
+zone2_y = 10
+zone3_x = 0
+zone3_y = panel_hight/2.68 + 10
+zone4_x = panel_width/2
+zone4_y = panel_hight/2.68 + 10
+
 def DrawScreen(draw):
     today=datetime.date.today()
     Year = today.strftime('%Y')
@@ -47,59 +62,65 @@ def DrawScreen(draw):
     SetDayStatus(festivalsDays, holiDays, workDays, str(currentYear))
     SetDayStatus(festivalsDays, holiDays, workDays, str(position2Year))
 
-    draw.line((481, 0, 481, 400), fill = 0)
-    draw.line((962, 0, 962, 400), fill = 0)
-    draw.line((0, 400, 1448, 400), fill = 0)
-    draw.line((724, 400, 724, 1072), fill = 0)
+#    draw.line((zone1_x, 0, zone1_x, zone3_y), fill = 0)
+#    draw.line((zone2_x, 0, zone2_x, zone3_y), fill = 0)
+    draw.line((0, zone3_y, panel_width, zone3_y), fill = 0)
+    draw.line((zone4_x, zone4_y, zone4_x, panel_hight), fill = 0)
 
-    DrawMonth(0, position0Year, position0Month)
-    DrawMonth(1, currentYear, currentMonth)
-    DrawMonth(2, position2Year, position2Month)
-    DrawBeginTask(0, 400)
-    DrawDueTask(724,400)
+    DrawMonth(zone0_x, zone0_y, position0Year, position0Month)
+    DrawMonth(zone1_x, zone1_y, currentYear, currentMonth)
+    DrawMonth(zone2_x, zone2_y, position2Year, position2Month)
+    DrawBeginTask(zone3_x, zone3_y)
+    DrawDueTask(zone4_x,zone4_y)
 def DrawBeginTask(original_x, original_y):
     cfg = ConfigParser()
-    cfg.read(runningDir + '/tasks/begintask.ini')
+    cfg.read(runningDir + '/tasks/task.ini')
     row = 0
-    fontTitle = ImageFont.truetype(runningDir + '/pic/Font.ttc', 42) 
-    fontTask = ImageFont.truetype(runningDir + '/pic/Font.ttc', 35) 
-    draw.text((original_x + 262, original_y + 15), u'待办事项', font = fontTitle, fill = 0)
-    for f in cfg['Tasks']:
+    fontTitle = ImageFont.truetype(runningDir + '/pic/Font.ttc', 20) 
+    fontTask = ImageFont.truetype(runningDir + '/pic/Font.ttc', 19)
+    fontTime = ImageFont.truetype(runningDir + '/pic/Font.ttc', 17)  
+    draw.text((original_x + 162, original_y + 10), u'待办事项', font = fontTitle, fill = 0)
+    for f in cfg['BeginTasks']:
         if row > 10:
-            draw.text((original_x + 12, original_y + 60 + row*50), "......", font = fontTask, fill = 0)
+            draw.text((original_x + 12, original_y + 40 + row*28), "......", font = fontTask, fill = 0)
             break
-        task = cfg.get(u'Tasks',f)
+        task = cfg.get(u'BeginTasks',f)
         title = task.split('|')[0]
         beginTime = task.split('|')[1]
         dueTime = task.split('|')[2]
-        title = TrimString(title, 14)
-        draw.text((original_x + 14, original_y + 80 + row*50), title, font = fontTask, fill = 0)
+        title = TrimString(title, 15)
+        draw.text((original_x + 4, original_y + 48 + row*28), title, font = fontTask, fill = 0)
         if(beginTime != "null"):
-            draw.text((original_x + 530, original_y + 80 + row*50), beginTime, font = fontTask, fill = 0)
+            beginTime = beginTime.split(' ')[2][0:5]
+            draw.text((original_x + 305, original_y + 48 + row*28), beginTime, font = fontTime, fill = 0)
         if(dueTime != "null"):
-            draw.text((original_x + 630, original_y + 80 + row*50), dueTime, font = fontTask, fill = 0)
+            dueTime = dueTime.split(' ')[2][0:5]
+            draw.text((original_x + 355, original_y + 48 + row*28), dueTime, font = fontTime, fill = 0)
         row = row + 1
 def DrawDueTask(original_x, original_y):
     cfg = ConfigParser()
-    cfg.read(runningDir + '/tasks/duetask.ini')
+    cfg.read(runningDir + '/tasks/task.ini')
     row = 0
-    fontTitle = ImageFont.truetype(runningDir + '/pic/Font.ttc', 42) 
-    fontTask = ImageFont.truetype(runningDir + '/pic/Font.ttc', 35) 
-    draw.text((original_x + 262, original_y + 15), u'今日截止', font = fontTitle, fill = 0)
-    for f in cfg['Tasks']:
+    fontTitle = ImageFont.truetype(runningDir + '/pic/Font.ttc', 20) 
+    fontTask = ImageFont.truetype(runningDir + '/pic/Font.ttc', 19) 
+    fontTime = ImageFont.truetype(runningDir + '/pic/Font.ttc', 18) 
+    draw.text((original_x + 162, original_y + 10), u'今日截止', font = fontTitle, fill = 0)
+    for f in cfg['DueTasks']:
         if row > 10:
-            draw.text((original_x + 14, original_y + 60 + row*50), "......", font = fontTask, fill = 0)
+            draw.text((original_x + 12, original_y + 40 + row*28), "......", font = fontTask, fill = 0)
             break
-        task = cfg.get(u'Tasks',f)
+        task = cfg.get(u'DueTasks',f)
         title = task.split('|')[0]
         beginTime = task.split('|')[1]
         dueTime = task.split('|')[2]
-        title = TrimString(title, 14)
-        draw.text((original_x + 12, original_y + 80 + row*50), title, font = fontTask, fill = 0)
+        title = TrimString(title, 15)
+        draw.text((original_x + 4, original_y + 48 + row*28), title, font = fontTask, fill = 0)
         if(beginTime != "null"):
-            draw.text((original_x + 530, original_y + 80 + row*50), beginTime, font = fontTask, fill = 0)
+            beginTime = beginTime.split(' ')[2][0:5]
+            draw.text((original_x + 305, original_y + 48 + row*28), beginTime, font = fontTime, fill = 0)
         if(dueTime != "null"):
-            draw.text((original_x + 630, original_y + 80 + row*50), dueTime, font = fontTask, fill = 0)
+            dueTime = dueTime.split(' ')[2][0:5]
+            draw.text((original_x + 355, original_y + 48 + row*28), dueTime, font = fontTime, fill = 0)
         row = row + 1
 def TrimString(srcString, width):
         TrimedString = ""
@@ -122,33 +143,25 @@ def TrimString(srcString, width):
                     break
                 TrimedString = TrimedString + srcString[i]
         return TrimedString + "..."
-def DrawMonth(position,year, month):
+def DrawMonth(original_x, original_y,year, month):
     dateMatrix = calendar.monthcalendar(year, month)
-    original_x = original_y = 0
-    if position == 0:
-        original_x = 0
-        original_y = 0
-    elif position == 1:
-        original_x = 482
-        original_y = 0 
-    elif position == 2:           
-        original_x = 965
-        original_y = 0
-    fontTitle = ImageFont.truetype(runningDir + '/pic/Font.ttc', 38) 
-    draw.text((original_x + 130, original_y), str(year)+u'年'+str(month)+u'月', font = fontTitle, fill = 0) 
+    fontTitle = ImageFont.truetype(runningDir + '/pic/Font.ttc', 18) 
+    draw.text((original_x + 100, original_y), str(year)+u'年'+str(month)+u'月', font = fontTitle, fill = 0) 
     weekList = [u'一',u'二',u'三',u'四',u'五',u'六',u'日']
 
     for i in range(0,7):
-        draw.text((original_x + 2 + i*65, original_y + 50), weekList[i], font = fontTitle, fill = 0) 
+        draw.text((original_x + 2 + i*36, original_y + 25), weekList[i], font = fontTitle, fill = 0) 
     for row in range(len(dateMatrix)):
         for col in range(len(dateMatrix[row])):
             DrawDate(dateMatrix, row, col,original_x,original_y,year,month)        
 
 def DrawDate(dateMatrix, row, col,original_x,original_y,year,month):
-    fontDate = ImageFont.truetype(runningDir + '/pic/Font.ttc', 32) 
-    fontFestival = ImageFont.truetype(runningDir + '/pic/Font.ttc', 30) 
+    fontDate = ImageFont.truetype(runningDir + '/pic/Font.ttc', 16) 
+    fontFestival = ImageFont.truetype(runningDir + '/pic/Font.ttc', 15) 
     today = datetime.date.today()
     currentDay = 0
+    rowSpan = 34
+    colSpan = 36
     monthValue = str(month)
     dayValue = str(dateMatrix[row][col])
     if month < 10:
@@ -158,26 +171,25 @@ def DrawDate(dateMatrix, row, col,original_x,original_y,year,month):
     keyValue = str(year) + monthValue + dayValue
     if today.strftime('%Y%m%d') == keyValue :
         currentDay = 1
-        draw.rectangle((original_x + 6 + col*65, original_y + 108 + row*58, original_x  + col*68 + 40, original_y + 145 + row*58), fill = 0)
+        draw.rectangle((original_x + 0 + col*colSpan, original_y + 55 + row*rowSpan, original_x  + col*colSpan + 19, original_y + 72 + row*rowSpan), fill = 0)
     else:
         currentDay = 0
-
     if  dateMatrix[row][col] == 0:
         return
     if dateMatrix[row][col] < 10:
-        draw.text((original_x + 16 + col*65, original_y + 110 + row*58), str(dateMatrix[row][col]), font = fontDate, fill = currentDay) 
+        draw.text((original_x + 5 + col*colSpan, original_y + 55 + row*rowSpan), str(dateMatrix[row][col]), font = fontDate, fill = currentDay) 
     else:    
-        draw.text((original_x + 6 + col*65, original_y + 110 + row*58), str(dateMatrix[row][col]), font = fontDate, fill = currentDay)   
+        draw.text((original_x + 1 + col*colSpan, original_y + 55 + row*rowSpan), str(dateMatrix[row][col]), font = fontDate, fill = currentDay)   
     #绘制节日名称
     if (keyValue in festivalsDays.keys()):
-        draw.text((original_x + 42 + col*65, original_y + 96 + row*58), festivalsDays[keyValue][0], font = fontFestival, fill = 0)  
-        draw.text((original_x + 42 + col*65, original_y + 130 + row*58), festivalsDays[keyValue][1], font = fontFestival, fill = 0)  
+        draw.text((original_x + 20 + col*colSpan, original_y + 48 + row*rowSpan), festivalsDays[keyValue][0], font = fontFestival, fill = 0)  
+        draw.text((original_x + 20 + col*colSpan, original_y + 64 + row*rowSpan), festivalsDays[keyValue][1], font = fontFestival, fill = 0)  
     #绘制放假标志
     if (keyValue in holiDays.keys()):
-        draw.rectangle((original_x + 7 + col*65, original_y + 108 + row*58, original_x  + col*65 + 43, original_y + 144 + row*58), outline = 0)
+        draw.rectangle((original_x + 0 + col*colSpan, original_y + 55 + row*rowSpan, original_x  + col*colSpan + 19, original_y + 72 + row*rowSpan), outline = 0)
     #绘制上班标志
     if (keyValue in workDays.keys()):
-        draw.arc((original_x + 5 + col*65, original_y + 109 + row*58, original_x  + col*65 + 44, original_y + 145 + row*58), 0, 360, fill = 0)
+        draw.arc((original_x + 1 + col*colSpan, original_y + 55 + row*rowSpan, original_x  + col*colSpan + 19, original_y + 72 + row*rowSpan), 0, 360, fill = 0)
 
 def SetDayStatus(festivalsDays,holidays, workDays, year):
     cfg = ConfigParser()
@@ -200,41 +212,32 @@ def SetDayStatus(festivalsDays,holidays, workDays, year):
             dateList = dates.split(',')
             for d in dateList:
                 workDays[year + d] = f
-def TaskFileUpdated(LastUpdatedTime):
-    BeginCfg = ConfigParser()
-    BeginCfg.read(runningDir + '/tasks/begintask.ini')
-    if(not BeginCfg.has_option('Info','Last update time')):
+def TaskFileUpdated(LastSyncTime):
+    Cfg = ConfigParser()
+    Cfg.read(runningDir + '/tasks/task.ini')
+    if(not Cfg.has_option('Info','Last sync time')):
         return 0
-
-    DueCfg = ConfigParser()
-    DueCfg.read(runningDir + '/tasks/duetask.ini')
-    if(not DueCfg.has_option('Info','Last update time')):
-        return 0
-
-    BeginCfgUpdateTime = BeginCfg.get('Info','Last update time')
-    DueCfgUpdateTime = DueCfg.get('Info','Last update time')
-
-    if(LastUpdatedTime[0] != BeginCfgUpdateTime or LastUpdatedTime[1] != DueCfgUpdateTime):
-        LastUpdatedTime[0] = BeginCfg.get('Info','Last update time') 
-        LastUpdatedTime[1] = DueCfg.get('Info','Last update time')
+    CfgSyncTime = Cfg.get('Info','Last sync time')
+    if(LastSyncTime[0] != CfgSyncTime):
+        LastSyncTime[0] = CfgSyncTime 
         return 1
     else:
         return 0
 
 try:
     logging.info("The daemon starts...")
-    LastUpdatedTime = ['','']
+    LastSyncTime = ['']
     while 1:
-        if(TaskFileUpdated(LastUpdatedTime)):
+        if(TaskFileUpdated(LastSyncTime)):
             logging.info("Start to update...")
-            Himage = Image.new('1', (1448, 1072), 255)  # 255: clear the frame
+            Himage = Image.new('1', (800, 600), 255)  # 255: clear the frame
             draw = ImageDraw.Draw(Himage)
             DrawScreen(draw)
             Himage.save(runningDir + '/pic/epd.bmp', 'bmp')
-            #epdLib = cdll.LoadLibrary("./IT8951/epd.so")
-            #epdLib.epd_6inch_init() 
-            #epdLib.Display_epd_bmp()
-            #epdLib.edp_6inch_deinit()
+            epdLib = cdll.LoadLibrary(runningDir + "/IT8951/epd.so")
+            epdLib.epd_6inch_init() 
+            epdLib.Display_epd_bmp()
+            epdLib.edp_6inch_deinit()
             logging.info("Finish...")
         time.sleep(1)
 except IOError as e:
